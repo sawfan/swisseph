@@ -6,7 +6,7 @@ periodically.
 ## Minor Planet Names: Alphabetical List
 
 This is an alphabetical listing of the names of the numbered minor
-planets. It was last updated on 29-Oct-2025
+planets. It was last updated on 30-Oct-2025
 
 
 ------------------------------------------------------------------------
@@ -1002,7 +1002,7 @@ planets. It was last updated on 29-Oct-2025
   (5761) Andreivanov                   Andreivanov
  (14040) Andrejka                      Andrejka
   (8477) Andrejkiselev                 Andrejkiselev
-(808162) Andrejserglis                 Andrejs\={e}rglis
+(808162) Andrejserglis                 Andrejsērglis
  (11244) Andrekuipers                  Andrékuipers
 (116166) Andremaeder                   Andrémaeder
   (2282) Andres Bello                  Andrés Bello
@@ -2165,7 +2165,7 @@ planets. It was last updated on 29-Oct-2025
   (7333) Bec-Borsenberger              Bec-Borsenberger
 (440670) Becassine                     Becassine
   (8935) Beccaria                      Beccaria
-(782609) Beches                        Beche\c{s}
+(782609) Beches                        Becheș
  (21269) Bechini                       Bechini
   (5024) Bechmann                      Bechmann
  (10856) Bechstein                     Bechstein
@@ -5033,7 +5033,7 @@ planets. It was last updated on 29-Oct-2025
 (120214) Danteberdeguez                Danteberdeguez
  (28563) Dantzler                      Dantzler
   (1381) Danubia                       Danubia
-(653667) Danutionescu                  D\u{a}nuționescu
+(653667) Danutionescu                  Dănuționescu
   (5463) Danwelcher                    Danwelcher
  (21813) Danwinegar                    Danwinegar
  (21488) Danyellelee                   Danyellelee
@@ -5550,7 +5550,7 @@ planets. It was last updated on 29-Oct-2025
 (767327) Diamandi                      Diamandi
  (19774) Diamondback                   Diamondback
     (78) Diana                         Diana
-(743062) Dianabesliu                   Dianabe\c{s}liu
+(743062) Dianabesliu                   Dianabeșliu
  (33034) Dianadamrau                   Dianadamrau
  (21520) Dianaeheart                   Dianaeheart
  (50252) Dianahannikainen              Dianahannikainen
@@ -6234,7 +6234,7 @@ planets. It was last updated on 29-Oct-2025
 (346318) Elektrenai                    Elektrenai
 (268686) Elenaaprile                   Elenaaprile
  (33539) Elenaberman                   Elenaberman
-(278640) Elenacerniene                 Elenačernien\.{e}
+(278640) Elenacerniene                 Elenačernienė
  (58580) Elenacuoghi                   Elenacuoghi
 (315941) Elenagomez                    Elenagómez
  (52384) Elenapanko                    Elenapanko
@@ -15114,7 +15114,7 @@ planets. It was last updated on 29-Oct-2025
  (11193) Merida                        Mérida
  (15403) Merignac                      Mérignac
   (3596) Meriones                      Meriones
-(308934) Merkine                       Merkin\.{e}
+(308934) Merkine                       Merkinė
  (22132) Merkley                       Merkley
  (16269) Merkord                       Merkord
   (2598) Merlin                        Merlin
@@ -15294,7 +15294,7 @@ planets. It was last updated on 29-Oct-2025
  (30437) Michtchenko                   Michtchenko
  (34660) Mickeyvillarreal              Mickeyvillarreal
   (5889) Mickiewicz                    Mickiewicz
-(761083) Miclos                        Miclo\c{s}
+(761083) Miclos                        Micloș
 (224617) Micromegas                    Micromégas
   (1981) Midas                         Midas
  (13396) Midavaine                     Midavaine
@@ -17876,7 +17876,7 @@ planets. It was last updated on 29-Oct-2025
  (11463) Petrpokorny                   Petrpokorny
   (4790) Petrpravec                    Petrpravec
 (274981) Petrsu                        Petrsu
-(566939) Petrucraciun                  Petrucr\u{a}ciun
+(566939) Petrucraciun                  Petrucrăciun
   (9707) Petruskoning                  Petruskoning
  (36035) Petrvok                       Petrvok
  (21087) Petsimpallas                  Petsimpallas
@@ -21217,7 +21217,7 @@ planets. It was last updated on 29-Oct-2025
   (8074) Slade                         Slade
   (4781) Sladkovic                     Sládkovič
  (14708) Slaven                        Slaven
-(214678) Slavenas                      Slav\.{e}nas
+(214678) Slavenas                      Slavėnas
   (2304) Slavia                        Slavia
  (31124) Slavicek                      Slavíček
  (11325) Slavicky                      Slavický
@@ -22448,7 +22448,7 @@ planets. It was last updated on 29-Oct-2025
    (512) Taurinensis                   Taurinensis
    (814) Tauris                        Tauris
   (2424) Tautenburg                    Tautenburg
-(135561) Tautvaisiene                  Tautvaišien\.{e}
+(135561) Tautvaisiene                  Tautvaišienė
 (314040) Tavannes                      Tavannes
   (2512) Tavastia                      Tavastia
  (12623) Tawaddud                      Tawaddud
@@ -22802,7 +22802,7 @@ planets. It was last updated on 29-Oct-2025
  (32519) Timholt                       Timholt
   (6398) Timhunter                     Timhunter
   (6082) Timiryazev                    Timiryazev
-(708722) Timisoara                     Timi\c{s}oara
+(708722) Timisoara                     Timișoara
   (7007) Timjull                       Timjull
  (33933) Timlister                     Timlister
   (7982) Timmartin                     Timmartin
@@ -24002,7 +24002,7 @@ planets. It was last updated on 29-Oct-2025
  (34271) Vinjaivale                    Vinjaivale
  (18924) Vinjamoori                    Vinjamoori
 (113214) Vinko                         Vinkó
-(694537) Vintdevara                    Vîntdevar\u{a}
+(694537) Vintdevara                    Vîntdevară
   (1544) Vinterhansenia                Vinterhansenia
   (1076) Viola                         Viola
   (9173) Viola Castello                Viola Castello
@@ -25657,7 +25657,7 @@ planets. It was last updated on 29-Oct-2025
 (469705) |=Kagara                      |=Kagara
 
 added 29-oct-2025
-(808162) Andrejserglis                 Andrejs\={e}rglis
+(808162) Andrejserglis                 Andrejsērglis
 (176981) Anteradonic                   Anteradonić
 (251014) Bejczyantal                   Bejczyantal
  (29730) Bethwestfall                  Bethwestfall
@@ -25722,7 +25722,7 @@ Added 13-Sep-2025
   (12955)    Alexdekoter                Alexdekoter
  (808162)    Andrejserglis              Andrejserglis
   (35298)    Azumachiharu               Azumachiharu
- (782609)    Beches                     Beche\c{s}
+ (782609)    Beches                     Becheș
  (353817)    Bolduc-Duval               Bolduc-Duval
  (807098)    Chensong                   Chensong
   (14005)    Ferrinmoreiras             Ferrinmoreiras
@@ -25754,7 +25754,7 @@ Added 20-Aug-25
 (635483)    Casimir                    Casimir
 (532037)    Chiminigagua               Chiminigagua
 (363124)    Ciottolimeco               Ciottolimeco
-(653667)    Danutionescu               D\u{a}nuționescu
+(653667)    Danutionescu               Dănuționescu
 (262825)    Dianearbus                 Dianearbus
 (735177)    Dinev                      Dinev
  (30285)    Ellsworth-Bowers           Ellsworth-Bowers
@@ -25778,7 +25778,7 @@ Added 20-Aug-25
  (55987)    Mariaruiz                  Maríaruiz
 (212121)    Marthegautier              Marthegautier
   (6283)    Menghuazhu                 Menghuazhu
-(761083)    Miclos                     Miclo\c{s}
+(761083)    Miclos                     Micloș
  (50426)    Mikemerrifield             Mikemerrifield
  (94243)    Miquelroser                Miquelroser
 (627435)    Mircearusu                 Mircearusu
@@ -25882,7 +25882,7 @@ Added 22-jul-25
  (12947) Paulgroot                     Paulgroot
  (22649) Paulineloader                 Paulineloader
 (333546) Perkins                       Perkins
-(566939) Petrucraciun                  Petrucr\u{a}ciun
+(566939) Petrucraciun                  Petrucrăciun
 (727524) Pierrepaquette                Pierrepaquette
  (12946) Portegieszwart                Portegieszwart
 (667514) Pozonunez                     Pozonuñez
@@ -26087,7 +26087,7 @@ Added 25-jun-25
 (356786) Shuike                        Shuike
 (292490) Sienkiewicz                   Sienkiewicz
 (333230) Simkus                        Simkus
-(214678) Slavenas                      Slav\.{e}nas
+(214678) Slavenas                      Slavėnas
 (198968) Sparke                        Sparke
 (377108) Spoelie                       Spoelie
 (628318) Stevemould                    Stevemould
@@ -26148,12 +26148,12 @@ Added 9-apr-25
  (21578) Davidgillette                 Davidgillette
  (20059) Debswoboda                    Debswoboda
 (127664) Denza                         Denza
-(743062) Dianabesliu                   Dianabe\c{s}liu
+(743062) Dianabesliu                   Dianabeșliu
  (21943) Diannacowern                  Diannacowern
 (270984) Dikschmidt                    Dikschmidt
 (701781) Dougjohnstone                 Dougjohnstone
 (235985) Dougrodgers                   Dougrodgers
-(278640) Elenacerniene                 Elenačernien\.{e}
+(278640) Elenacerniene                 Elenačernienė
 (315941) Elenagomez                    Elenagómez
 (235145) Ericquirico                   Ericquirico
 (553035) Faikmusayev                   Faikmusayev
@@ -26275,11 +26275,11 @@ Added 9-apr-25
 (715542) Tafforin                      Tafforin
  (29144) Taitokufuji                   Taitokufuji
 (471325) Taowu                         Taowu
-(135561) Tautvaisiene                  Tautvaišien\.{e}
+(135561) Tautvaisiene                  Tautvaišienė
 (230728) Tedstryk                      Tedstryk
  (22955) Tibees                        Tibees
  (27234) Timdodd                       Timdodd
-(708722) Timisoara                     Timi\c{s}oara
+(708722) Timisoara                     Timișoara
 (239126) Tommygreathouse               Tommygreathouse
  (14008) Toniscarmato                  Toniscarmato
  (23004) Triciatalbert                 Triciatalbert
@@ -26313,7 +26313,7 @@ Added 11-feb-25
 (633909) Lazutkin                      Lazutkin
 (658398) Lufonds                       Lufonds
 (573731) Matsnev                       Matsnev
-(308934) Merkine                       Merkin\.{e}
+(308934) Merkine                       Merkinė
  (63787) Michelmaurette                Michelmaurette
 (366487) Neilyoung                     Neilyoung
  (19121) Rathnasree                    Rathnasree
@@ -26326,7 +26326,7 @@ Added 11-feb-25
 (724666) Unda-Sanzana                  Unda-Sanzana
 (546186) Vasylivchenko                 Vasylivchenko
 (633570) Viktorzagainov                Viktorzagainov
-(694537) Vintdevara                    Vîntdevar\u{a}
+(694537) Vintdevara                    Vîntdevară
 (157894) Yasminwalter                  Yasminwalter
  (48408) Yoshinogari                   Yoshinogari
 
