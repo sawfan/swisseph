@@ -18,7 +18,7 @@
 #    swetest     - Build the swetest executable using libswe.a (dynamic linking)
 #    swetests    - Build a fully statically linked swetest (Linux only)
 #    swevents    - Build the swevents executable
-#    swemini     - Build the swemini executable using libswe.a (dynamic linking)
+#    swemini     - Build the swemini executable using libswe.a (static linking)
 #    libswe.a    - Create the static library archive from object files
 #    libswe.$(DYLIB_EXT)
 #                - Create the shared library (extension depends on OS)
@@ -57,7 +57,7 @@ SWEOBJ = swedate.o swehouse.o swejpl.o swemmoon.o swemplan.o sweph.o \
 
 # Define overall targets. On Linux, include the static swetests target.
 ifeq ($(STATIC_SUPPORTED),true)
-ALL_TARGETS = swetest swetests swevents swemini
+ALL_TARGETS = swetest swetests swevents swemini obama
 else
 ALL_TARGETS = swetest swevents swemini
 endif
@@ -91,6 +91,10 @@ sweventss: swevents.o $(SWEOBJ)
 # Build swemini
 swemini: swemini.o libswe.a
 	$(CC) $(CFLAGS) -o swemini swemini.o -L. -lswe $(LIBS)
+
+# Build obama
+obama: obama.o libswe.a
+	$(CC) $(CFLAGS) -o obama obama.o -L. -lswe $(LIBS)
 
 # Create a static library from the object files
 libswe.a: $(SWEOBJ)
