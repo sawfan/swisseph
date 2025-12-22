@@ -145,7 +145,8 @@ static char *info1 = "\n\
 	 -ep		  use extended precision in output\n\n\
 	Options only for use by Astrodienst:\n\
 	-mscreen output on screen\n\
-	-mps postscript [default: HP Laserjet]\n\
+	-mpdf pdf output \n\
+	-mps postscript \n\
 	-cycol.. number cycles per column\n\
 \n\
 	-?	display this info\n\
