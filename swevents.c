@@ -138,12 +138,13 @@ static char *info1 = "\n\
 	 -znam3		use 3-letter sign names\n\
 	 -monnum	use month numbers instead of names\n\
 	 -gmtoff X	use X hours gmt offset (+ for east)\n\
-	 -tzoneTIMEZONE output date and time in timezone (hours east)\n\
-	 -aznANR	 output date and time in locat time of Astrozone ANR\n\
 	 -transitstderr lists transits of Venus or Mercury as c style data to stderr \n\
 	 -jd	show also jd in output \n\
 	 -ep		  use extended precision in output\n\n\
+	-tzoneTIMEZONE output date and time in timezone (hours east)\n\
+\n\
 	Options only for use by Astrodienst:\n\
+	-aznANR	 output date and time in locat time of Astrozone ANR\n\
 	-mscreen output on screen\n\
 	-mpdf pdf output \n\
 	-mps postscript \n\
@@ -392,8 +393,9 @@ int main(int argc, char *argv[])
   /*double tjd = 2436723.589269907;*/
   double tjd = 2436723.588888889;
   double t, te, tend, t2, t3, tstep;
-  double delt;
+  double delt, xarr[12];
   struct tm *tim;
+  int32 sid_mode = SE_SIDM_FAGAN_BRADLEY;	// only used with -sid option
   time_t tloc;
   EVENT *pev0;
   tstep = 1;
@@ -556,6 +558,17 @@ int main(int argc, char *argv[])
       tzone = atof(argv[i]+6);
     } else if (strncmp(argv[i], "-transitstderr", 6) == 0) {
       transits_to_stderr = TRUE;
+    } else if (strncmp(argv[i], "-sid", 4) == 0) {
+      iflag |= SEFLG_SIDEREAL;
+      sid_mode = atol(argv[i]+4);
+    } else if (strncmp(argv[i], "-xarr", 4) == 0) {	// experimental, implementatio incomplete
+      sp = argv[i] + 5;
+      n = sscanf(sp, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", xarr, xarr+1, xarr+2,
+        xarr+3, xarr+4, xarr+5,xarr+6,xarr+7,xarr+8,xarr+9,xarr+10,xarr+11);
+      if (n != 12) {
+	printf("-xarr must be followed directly by 12 numbers, separated by comma. This is not correct\n %s\n", argv[i]);
+	exit(1);
+      }
     } else {
       printf("illegal option %s\n", argv[i]);
       exit(1);
@@ -632,6 +645,9 @@ int main(int argc, char *argv[])
 							get jd for the
 							date you want */
   }
+  if ((iflag & SEFLG_SIDEREAL)) {
+    swe_set_sid_mode(sid_mode, 0, 0);
+  }
   sprintf(syear0, "%02d", jyear);
   swe_revjul(tjd + tstep * nstep, gregflag, &jyear, &jmon, &jday, &jut);
   sprintf(sdateto, "%02d", jyear);
@@ -646,7 +662,6 @@ int main(int argc, char *argv[])
       gregflag = TRUE;
     swe_revjul(t, gregflag, &jyear, &jmon, &jday, &jut);
     if (!ephemeris_time) {
-      //delt = swe_deltat(t);
       delt = swe_deltat_ex(t, whicheph, serr);
       te = t + delt;
     } else {
@@ -1413,12 +1428,12 @@ static int print_motab(void)
  */
 static void print_item(char *s, double teph, double dpos, double delon, double dmag)
 {
-  static char smag[AS_MAXCH], sout[AS_MAXCH], serr[AS_MAXCH];
+  static char smag[AS_MAXCH], sout[4 * AS_MAXCH], serr[AS_MAXCH];
   int mout, dout, yout, hour, min, sec, izod;
   int ing_deg = 0;
   double hout;
   double secfr;
-  double jut;
+  double delt, jut;
   AS_BOOL is_ingress;
   AS_BOOL is_ingr45;
   AS_BOOL is_phase;
@@ -1659,7 +1674,6 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
       SetFont(FT_TIM_10);
       Print(sout);
       if (azn > 0) {
-	double delt;
 	SetFont(FT_TIM_8);
 	MoveToXYmm(xcol[col_count], ytop - 2 * line_space);
 	sprintf(sout, "(clock times given in local time of Astrodienst Zone %d)", azn);
@@ -1700,6 +1714,9 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
     ncpt = TextWidth("May") - TextWidth(month_nam[mout]);
     RmoveXcp(ncpt);
     sprintf(sout, " %02d %s %02d:%02d", dout, jul, hour, min);
+    } else {
+      sprintf(sout, " %02d %s %02d:%02d:%02d", dout, jul, hour, min, sec);
+    }
     if (azn > 0) {
       sprintf(sout + strlen(sout), " %s", trp->tzabbr_eff);
     }
@@ -2037,7 +2054,11 @@ static int32 call_swe_calc(double tjd, int32 ipl, int32 iflag, char *star, doubl
   if (ipl == SE_FIXSTAR) {
     return swe_fixstar(star, tjd, iflag, x, serr);
   } else {
-    return swe_calc(tjd, ipl, iflag, x, serr);
+    int ret = swe_calc(tjd, ipl, iflag, x, serr);
+    if (ret < 0) {
+      fprintf(stderr, "tj=%lf  ipl=%d %s\n", tjd, ipl, serr);
+    }
+    return ret;
   }
 }
 
