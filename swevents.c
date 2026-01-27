@@ -1433,7 +1433,7 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
   int ing_deg = 0;
   double hout;
   double secfr;
-  double delt, jut;
+  double jut;
   AS_BOOL is_ingress;
   AS_BOOL is_ingr45;
   AS_BOOL is_phase;
@@ -1519,6 +1519,9 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
   }
 #endif
   swe_revjul(teph, gregflag, &yout, &mout, &dout, &hout);
+  if (do_round_min)
+    swe_split_deg(hout, SE_SPLIT_DEG_ROUND_MIN, &hour, &min, &sec, &secfr, &izod);
+  else
   swe_split_deg(hout, SE_SPLIT_DEG_ROUND_SEC, &hour, &min, &sec, &secfr, &izod);
   if (dmag != HUGE) {
     if (strstr(s, "brill") != NULL) {
@@ -1713,7 +1716,8 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
     Print(month_nam[mout]);
     ncpt = TextWidth("May") - TextWidth(month_nam[mout]);
     RmoveXcp(ncpt);
-    sprintf(sout, " %02d %s %02d:%02d", dout, jul, hour, min);
+    if (do_round_min) {
+      sprintf(sout, " %02d %s %02d:%02d", dout, jul, hour, min);
     } else {
       sprintf(sout, " %02d %s %02d:%02d:%02d", dout, jul, hour, min, sec);
     }
