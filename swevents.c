@@ -124,23 +124,23 @@ static char *info1 = "\n\
 		the begin date string contains blanks; use format -bj2400000.5\n\
 		to express the date as absolute Julian day number.\n\
 		Note: the date format is day month year (European style).\n\
-	 -eswe  swiss ephemeris\n\
-	 -ejpl  jpl ephemeris (DE431), or with ephemeris file name\n\
-	 	-ejplde200.eph\n\
-	 -emos  moshier ephemeris\n\
-	 -true	true positions\n\
-	 -noaberr	no aberration\n\
-	 -nodefl	no gravitational light deflection\n\
-	 -noprec	no precession (i.e. J2000 positions)\n\
-	 -nonut		no nutation \n\
-	 -dgap		use gap within date\n\
-	 -zlong		use long sign names\n\
-	 -znam3		use 3-letter sign names\n\
-	 -monnum	use month numbers instead of names\n\
-	 -gmtoff X	use X hours gmt offset (+ for east)\n\
-	 -transitstderr lists transits of Venus or Mercury as c style data to stderr \n\
-	 -jd	show also jd in output \n\
-	 -ep		  use extended precision in output\n\n\
+	-eswe  swiss ephemeris\n\
+	-ejpl  jpl ephemeris (DE431), or with ephemeris file name\n\
+	      -ejplde200.eph\n\
+	-emos  moshier ephemeris\n\
+	-true	true positions\n\
+	-noaberr	no aberration\n\
+	-nodefl	no gravitational light deflection\n\
+	-noprec	no precession (i.e. J2000 positions)\n\
+	-nonut		no nutation \n\
+	-dgap		use gap within date\n\
+	-zlong		use long sign names\n\
+	-znam3		use 3-letter sign names\n\
+	-monnum	use month numbers instead of names\n\
+	-gmtoff X	use X hours gmt offset (+ for east)\n\
+	-transitstderr lists transits of Venus or Mercury as c style data to stderr \n\
+	-jd	show also jd in output \n\
+	-ep		  use extended precision in output\n\n\
 	-tzoneTIMEZONE output date and time in timezone (hours east)\n\
 \n\
 	Options only for use by Astrodienst:\n\
@@ -207,7 +207,7 @@ static char *info2 = "Planet selection (only one possible):\n\
 	-10		go back in time 10 days\n";
 /**************************************************************/
 
-#define PRINTMOD 0
+#define PRINTMOD 1
 
 #if PRINTMOD
 #  include "ourdef.h"
@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
   int iplfrom = SE_VENUS;
   int nstep = 0, istep;
   double dx;
-  double x[6], xs[6], x0[6], x1[6], x2[6];
+  double x[6], xs[6], x0[6], x1[6], x2[6], xd[6];
   double xp[6], xp0[6], xp1[6] = {0}, xp2[6], xs0[6], xs1[6] = {0}, xs2[6];
   double xel0[6], xel1[6] = {0}, xel2[6], xang0[6], xang1[6] = {0}, xang2[6], xma0[6], xma1[6] = {0}, xma2[6];
   double xh0[6], xh1[6] = {0}, xh2[6];
@@ -1152,13 +1152,14 @@ int main(int argc, char *argv[])
 	  find_maximum(x0[0], x0[1], x0[2], dt1, &dt, &xel);
 	  t2 = t2 + dt1 + dt;
 	}
-	iflgret = swe_calc(t2, (int) ipl, iflag|SEFLG_EQUATORIAL, x, serr);
+	iflgret = swe_calc(t2, (int) ipl, iflag|SEFLG_EQUATORIAL, xd, serr);
+	iflgret = swe_calc(t2, (int) ipl, iflag, x, serr);
 	if (xd2[1] < xd1[1]) {
 	  strcpy(sout, "max. declination.");
 	} else {
 	  strcpy(sout, "min. declination.");
 	}
-	print_item(sout, t2, x[0] * RADTODEG, HUGE, x[1] * RADTODEG);
+	print_item(sout, t2, x[0] * RADTODEG, HUGE, xd[1] * RADTODEG);
       }
       l_nodecl:;
       if (!(do_flag & DO_NODE))
@@ -1506,9 +1507,9 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
     teph = teph - swe_deltat_ex(teph, whicheph, serr);
   }
   // compute UT and add 0.5 minutes for later rounding to minutes 
-  if (do_round_min) {
-    teph += 0.5 / 1440.0 ;
-  }
+  // if (do_round_min) {
+  //   teph += 0.5 / 1440.0 ;
+  // }
 #if PRINTMOD
   if (azn > 0) {
     if (ttb2_get_time_zone(global_ttb_mode, trp, 0, -2, azn, teph, TTB_DO_LOCAL, serr) == OK) {
@@ -1522,7 +1523,7 @@ static void print_item(char *s, double teph, double dpos, double delon, double d
   if (do_round_min)
     swe_split_deg(hout, SE_SPLIT_DEG_ROUND_MIN, &hour, &min, &sec, &secfr, &izod);
   else
-  swe_split_deg(hout, SE_SPLIT_DEG_ROUND_SEC, &hour, &min, &sec, &secfr, &izod);
+    swe_split_deg(hout, SE_SPLIT_DEG_ROUND_SEC, &hour, &min, &sec, &secfr, &izod);
   if (dmag != HUGE) {
     if (strstr(s, "brill") != NULL) {
       sprintf(smag, "    %.1fm", dmag);
