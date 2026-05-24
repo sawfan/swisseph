@@ -66,10 +66,16 @@
 #include <tchar.h>
 #include <windows.h>
 #endif
+#ifndef SE_NO_JPL
 #include "swejpl.h"
+#endif
 #include "swephexp.h"
 #include "sweph.h"
 #include "swephlib.h"
+
+#ifdef SE_USE_VFS
+#include "vfs/swevfs.h"
+#endif
 
 #ifdef _MSC_VER
 #define CMP_CALL_CONV __cdecl
@@ -2358,10 +2364,29 @@ again:
 }
 
 /*
- * Alois 2.12.98: inserted error message generation for file not found 
+ * Alois 2.12.98: inserted error message generation for file not found.
+ *
+ * Patched: route file open through the VFS layer.
  */
 FILE *swi_fopen(int ifno, char *fname, char *ephepath, char *serr)
 {
+#ifdef SE_USE_VFS
+  const swe_vfs_api *api = swi_get_vfs_api();
+  if (api == NULL || api->open == NULL) {
+    if (serr != NULL)
+      strcpy(serr, "SwissEph: no VFS backend registered");
+    return NULL;
+  }
+
+  /*
+   * When SE_USE_VFS is enabled, we don't return a real FILE*.
+   * Instead we return the backend handle cast to FILE*.
+   *
+   * All actual reads/seeks in this mode must go through do_fread(), which is
+   * patched below to call api->read_at().
+   */
+  return (FILE *) api->open(ifno, fname, ephepath, serr);
+#else
   int np, i, j;
   FILE *fp = NULL;
   char *fnamp, fn[AS_MAXCH];
@@ -2371,7 +2396,7 @@ FILE *swi_fopen(int ifno, char *fname, char *ephepath, char *serr)
   if (ifno >= 0) {
     fnamp = swed.fidat[ifno].fnam;
   } else {
-    fnamp = fn; 
+    fnamp = fn;
   }
   strcpy(s1, ephepath);
   np = swi_cutstr(s1, PATH_SEPARATOR, cpos, 20);
@@ -2383,25 +2408,26 @@ FILE *swi_fopen(int ifno, char *fname, char *ephepath, char *serr)
     } else {
       j = (int) strlen(s);
       if (*s != '\0' && *(s + j - 1) != *DIR_GLUE)
-	strcat(s, DIR_GLUE);
+        strcat(s, DIR_GLUE);
     }
     if (strlen(s) + strlen(fname) < AS_MAXCH) {
       strcat(s, fname);
     } else {
       if (serr != NULL)
-	sprintf(serr, "error: file path and name must be shorter than %d.", AS_MAXCH);
+        sprintf(serr, "error: file path and name must be shorter than %d.", AS_MAXCH);
       return NULL;
     }
     strcpy(fnamp, s);
     fp = fopen(fnamp, BFILE_R_ACCESS);
-    if (fp != NULL) 
+    if (fp != NULL)
       return fp;
   }
   sprintf(s, "SwissEph file '%s' not found in PATH '%s'", fname, ephepath);
-  s[AS_MAXCH-1] = '\0';		/* s must not be longer then AS_MAXCH */
+  s[AS_MAXCH - 1] = '\0'; /* s must not be longer then AS_MAXCH */
   if (serr != NULL)
     strcpy(serr, s);
   return NULL;
+#endif
 }
 
 int32 swi_get_denum(int32 ipli, int32 iflag)
@@ -4903,12 +4929,75 @@ return_error:
  */
 static int do_fread(void *trg, int size, int count, int corrsize, FILE *fp, int32 fpos, int freord, int fendian, int ifno, char *serr)
 {
-  int i, j, k; 
+  int i, j, k;
   int totsize;
   unsigned char space[1000];
   unsigned char *targ = (unsigned char *) trg;
   totsize = size * count;
-  if (fpos >= 0) 
+
+#ifdef SE_USE_VFS
+  /*
+   * VFS mode: `fp` is a disguised swe_vfs_handle and must not be passed to
+   * stdio functions. Reads are performed via `read_at`.
+   */
+  {
+    const swe_vfs_api *api = swi_get_vfs_api();
+    if (api == NULL || api->read_at == NULL) {
+      if (serr != NULL) {
+        strcpy(serr, "VFS backend not registered");
+      }
+      return ERR;
+    }
+
+    if (fpos < 0) {
+      if (serr != NULL) {
+        strcpy(serr, "VFS read requires absolute offset");
+      }
+      return ERR;
+    }
+
+    /* If no byte reorder has to be done, and read size == return size */
+    if (!freord && size == corrsize) {
+      size_t n = api->read_at((swe_vfs_handle) fp, (void *) targ, (size_t) size, (size_t) count, fpos, serr);
+      if ((int) n != count) {
+        if (serr != NULL && serr[0] == '\0') {
+          strcpy(serr, "Ephemeris file is damaged (VFS). ");
+        }
+        return ERR;
+      }
+      return OK;
+    } else {
+      size_t n = api->read_at((swe_vfs_handle) fp, (void *) &space[0], (size_t) size, (size_t) count, fpos, serr);
+      if ((int) n != count) {
+        if (serr != NULL && serr[0] == '\0') {
+          strcpy(serr, "Ephemeris file is damaged (VFS). ");
+        }
+        return ERR;
+      }
+
+      if (size != corrsize) {
+        memset((void *) targ, 0, (size_t) count * corrsize);
+      }
+      for(i = 0; i < count; i++) {
+        for (j = size-1; j >= 0; j--) {
+          if (freord) {
+            k = size-j-1;
+          } else {
+            k = j;
+          }
+          if (size != corrsize) {
+            if ((fendian == SEI_FILE_BIGENDIAN && !freord) ||
+                (fendian == SEI_FILE_LITENDIAN &&  freord))
+              k += corrsize - size;
+          }
+          targ[i*corrsize+k] = space[i*size+j];
+        }
+      }
+    }
+    return OK;
+  }
+#else
+  if (fpos >= 0)
     fseek(fp, fpos, SEEK_SET);
   /* if no byte reorder has to be done, and read size == return size */
   if (!freord && size == corrsize) {
@@ -4952,6 +5041,7 @@ static int do_fread(void *trg, int size, int count, int corrsize, FILE *fp, int3
     }
   }
   return(OK);
+#endif
 }
 
 /* SWISSEPH

@@ -740,6 +740,19 @@ ext_def( void ) swe_close(void);
 /* set directory path of ephemeris files */
 ext_def( void ) swe_set_ephe_path(const char *path);
 
+/*
+ * Set VFS callbacks used for ephemeris file access.
+ *
+ * - Pass NULL to reset to the default backend (stdio on native builds).
+ * - On targets without stdio/filesystem (e.g. wasm32-unknown-unknown with
+ *   SE_NO_STDIO), the application must register a VFS backend.
+ */
+#ifndef SWEVFS_H
+struct swe_vfs_api;
+typedef struct swe_vfs_api swe_vfs_api;
+#endif
+ext_def( void ) swe_set_vfs_api(const swe_vfs_api *api);
+
 /* set file name of JPL file */
 ext_def( void ) swe_set_jpl_file(const char *fname);
 
