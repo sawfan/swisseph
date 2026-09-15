@@ -18,6 +18,15 @@
 #include <stdint.h>
 #include <string.h>
 
+#define WASM_SEEK_SET 0
+#define WASM_SEEK_CUR 1
+#define WASM_SEEK_END 2
+
+typedef struct wasm_file_stub FILE;
+
+extern size_t swisseph_vfs_file_len(const char *name);
+extern size_t swisseph_vfs_read_file(const char *name, void *dst, size_t len, size_t offset);
+
 int sprintf(char *dst, const char *fmt, ...) {
   if (dst == NULL || fmt == NULL) {
     return 0;
@@ -37,34 +46,68 @@ int sprintf(char *dst, const char *fmt, ...) {
         p++;
         continue;
       }
+
+      int zero_pad = 0;
+      int width = 0;
+      if (*p == '0') {
+        zero_pad = 1;
+        p++;
+      }
+      while (*p >= '0' && *p <= '9') {
+        width = width * 10 + (*p - '0');
+        p++;
+      }
+
+      /* Length modifiers used by Swiss Ephemeris diagnostics. */
+      int long_arg = 0;
+      if (*p == 'l') {
+        long_arg = 1;
+        p++;
+      }
+
       if (*p == 's') {
         const char *s = va_arg(ap, const char *);
         if (s == NULL)
           s = "";
         size_t n = strlen(s);
+        size_t pad = width > (int)n ? (size_t)(width - (int)n) : 0;
+        while (pad-- > 0) {
+          *out++ = ' ';
+        }
         memcpy(out, s, n);
         out += n;
         p++;
         continue;
       }
       if (*p == 'd') {
-        int v = va_arg(ap, int);
+        long lv = long_arg ? va_arg(ap, long) : (long)va_arg(ap, int);
         char tmp[32];
         int neg = 0;
-        unsigned int u;
-        if (v < 0) {
+        unsigned long u;
+        if (lv < 0) {
           neg = 1;
-          u = (unsigned int)(-v);
+          u = (unsigned long)(-lv);
         } else {
-          u = (unsigned int)v;
+          u = (unsigned long)lv;
         }
         int i = 0;
         do {
           tmp[i++] = (char)('0' + (u % 10));
           u /= 10;
         } while (u && i < (int)sizeof(tmp));
-        if (neg && i < (int)sizeof(tmp)) {
-          tmp[i++] = '-';
+        int digits = i;
+        int sign_width = neg ? 1 : 0;
+        char pad_char = zero_pad ? '0' : ' ';
+        int pad = width - digits - sign_width;
+        if (neg && zero_pad) {
+          *out++ = '-';
+          neg = 0;
+        }
+        while (pad-- > 0) {
+          *out++ = pad_char;
+        }
+        if (neg) {
+          *out++ = '-';
         }
         while (i > 0) {
           *out++ = tmp[--i];
@@ -73,8 +116,26 @@ int sprintf(char *dst, const char *fmt, ...) {
         continue;
       }
 
-      /* Unknown specifier: just write '%' and the specifier literally. */
+      /* Unknown specifier: write the original marker literally enough for diagnostics. */
       *out++ = '%';
+      if (zero_pad) {
+        *out++ = '0';
+      }
+      if (width > 0) {
+        char tmp[16];
+        int i = 0;
+        int w = width;
+        do {
+          tmp[i++] = (char)('0' + (w % 10));
+          w /= 10;
+        } while (w && i < (int)sizeof(tmp));
+        while (i > 0) {
+          *out++ = tmp[--i];
+        }
+      }
+      if (long_arg) {
+        *out++ = 'l';
+      }
       if (*p) {
         *out++ = *p++;
       }
@@ -342,51 +403,142 @@ void rewind(void *_stream) {
 }
 
 /*
- * Minimal stdio stubs.
- *
- * With `SE_NO_STDIO` enabled these should not be used for real I/O, but some
- * units still reference them. We provide stubs to keep the linker happy.
+ * Minimal stdio shims backed by the Rust-uploaded in-memory ephemeris VFS.
  */
+struct wasm_file_stub {
+  char name[256];
+  size_t offset;
+  size_t len;
+};
+
+static FILE wasm_open_files[16];
+static int wasm_open_file_used[16];
+
+static const char *wasm_basename(const char *path) {
+  const char *last = path;
+  for (const char *p = path; *p; p++) {
+    if (*p == '/' || *p == '\\') {
+      last = p + 1;
+    }
+  }
+  return last;
+}
+
+FILE *fopen(const char *restrict pathname, const char *restrict mode) {
+  (void)mode;
+  if (pathname == NULL) {
+    return (FILE *)0;
+  }
+
+  const char *name = wasm_basename(pathname);
+  size_t file_len = swisseph_vfs_file_len(name);
+  if (file_len == 0) {
+    return (FILE *)0;
+  }
+
+  for (int i = 0; i < 16; i++) {
+    if (!wasm_open_file_used[i]) {
+      wasm_open_file_used[i] = 1;
+      strncpy(wasm_open_files[i].name, name, sizeof(wasm_open_files[i].name) - 1);
+      wasm_open_files[i].name[sizeof(wasm_open_files[i].name) - 1] = 0;
+      wasm_open_files[i].offset = 0;
+      wasm_open_files[i].len = file_len;
+      return &wasm_open_files[i];
+    }
+  }
+
+  return (FILE *)0;
+}
+
 int fclose(void *_stream) {
-  (void)_stream;
+  if (_stream == NULL) {
+    return 0;
+  }
+  FILE *stream = (FILE *)_stream;
+  for (int i = 0; i < 16; i++) {
+    if (&wasm_open_files[i] == stream) {
+      wasm_open_file_used[i] = 0;
+      wasm_open_files[i].name[0] = 0;
+      wasm_open_files[i].offset = 0;
+      wasm_open_files[i].len = 0;
+      break;
+    }
+  }
   return 0;
 }
 
 char *fgets(char *s, int size, void *_stream) {
-  (void)s;
-  (void)size;
-  (void)_stream;
-  return (char *)0;
+  if (s == NULL || _stream == NULL || size <= 0) {
+    return (char *)0;
+  }
+
+  FILE *stream = (FILE *)_stream;
+  int written = 0;
+  while (written < size - 1 && stream->offset < stream->len) {
+    char ch = 0;
+    size_t n = swisseph_vfs_read_file(stream->name, &ch, 1, stream->offset);
+    if (n != 1) {
+      break;
+    }
+    stream->offset += 1;
+    s[written++] = ch;
+    if (ch == '\n') {
+      break;
+    }
+  }
+
+  if (written == 0) {
+    return (char *)0;
+  }
+  s[written] = 0;
+  return s;
 }
 
-/*
- * Additional stdio-like stubs.
- *
- * Some Swiss Ephemeris units still reference these even with `SE_NO_STDIO`.
- * These are no-op / EOF stubs intended only to satisfy the linker.
- */
-typedef struct wasm_file_stub {
-  int _unused;
-} FILE;
-
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-  (void)ptr;
-  (void)size;
-  (void)nmemb;
-  (void)stream;
-  return 0;
+  if (ptr == NULL || stream == NULL || size == 0 || nmemb == 0) {
+    return 0;
+  }
+
+  size_t want = size * nmemb;
+  if (stream->offset > stream->len) {
+    return 0;
+  }
+  size_t available = stream->len - stream->offset;
+  size_t read_len = want < available ? want : available;
+  size_t actual = swisseph_vfs_read_file(stream->name, ptr, read_len, stream->offset);
+  stream->offset += actual;
+  return actual / size;
 }
 
 int fseek(FILE *stream, long offset, int whence) {
-  (void)stream;
-  (void)offset;
-  (void)whence;
-  return -1;
+  if (stream == NULL) {
+    return -1;
+  }
+
+  long base;
+  if (whence == WASM_SEEK_SET) {
+    base = 0;
+  } else if (whence == WASM_SEEK_CUR) {
+    base = (long)stream->offset;
+  } else if (whence == WASM_SEEK_END) {
+    base = (long)stream->len;
+  } else {
+    return -1;
+  }
+
+  long next = base + offset;
+  if (next < 0 || (size_t)next > stream->len) {
+    return -1;
+  }
+  stream->offset = (size_t)next;
+  return 0;
 }
 
 long ftell(FILE *stream) {
-  (void)stream;
-  return -1;
+  if (stream == NULL) {
+    return -1;
+  }
+  return (long)stream->offset;
 }
 
 /*
